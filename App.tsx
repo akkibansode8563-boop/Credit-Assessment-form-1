@@ -14,7 +14,6 @@ import {
   Download,
   AlertCircle,
   RefreshCw,
-  // Fix: Added CheckCircle2 which was missing in imports
   CheckCircle2
 } from 'lucide-react';
 import Header from './components/Header';
@@ -227,7 +226,7 @@ const App: React.FC = () => {
             <Section title="Section 7: Limit & Terms" icon={<FileText className="w-5 h-5" />}>
               <div className="space-y-4">
                 <Input label="Expected Credit Limit" value={formData.expectedCreditLimit} onChange={v => handleChange('expectedCreditLimit', v)} />
-                <Input label="New Increase Limit" value={formData.expectedCreditLimit} onChange={v => handleChange('newIncreaseCreditLimit', v)} />
+                <Input label="New Increase Limit" value={formData.newIncreaseCreditLimit} onChange={v => handleChange('newIncreaseCreditLimit', v)} />
                 <Input label="Proposed Payment Terms" value={formData.proposedPaymentTerms} onChange={v => handleChange('proposedPaymentTerms', v)} />
               </div>
             </Section>
@@ -247,8 +246,8 @@ const App: React.FC = () => {
                       <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Digital Sign</span>
                     </div>
                     <div className="space-y-3">
-                      <Input label="Name" value={formData.sanctions[key].name} onChange={v => handleChange(`sanctions.${key}.name`, v)} />
-                      <Input label="Date" type="date" value={formData.sanctions[key].date} onChange={v => handleChange(`sanctions.${key}.date`, v)} />
+                      {/* Name input removed as requested */}
+                      <Input label="Signature Date" type="date" value={formData.sanctions[key].date} onChange={v => handleChange(`sanctions.${key}.date`, v)} />
                     </div>
                   </div>
                 </div>

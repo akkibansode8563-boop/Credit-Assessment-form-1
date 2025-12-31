@@ -199,13 +199,11 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
       doc.setFont('helvetica', 'normal');
       doc.text(String(sig.designation || "Role"), x, yBase + sigLineOffset + 5);
       
-      doc.setTextColor(30, 41, 59); 
-      doc.setFont('helvetica', 'bold');
-      doc.text(String(sig.name || "Pending Name"), x, yBase + sigLineOffset + 9);
+      // Name rendering removed to support anonymous process
       
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
-      doc.text(`Date: ${String(sig.date || "-")}`, x, yBase + sigLineOffset + 12);
+      doc.text(`Date: ${String(sig.date || "-")}`, x, yBase + sigLineOffset + 9);
     });
 
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -222,7 +220,6 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
       doc.save(fileName);
     }
     
-    // Return base64 string for email/backend processing
     return doc.output('datauristring').split(',')[1];
   } catch (error) {
     console.error("PDF Export failed with error:", error);
