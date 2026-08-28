@@ -34,7 +34,10 @@ const getInitialState = (): FormData => ({
   salesManagerContact: '',
   customerCode: '', companyName: '', ownerName: '', yearEstablished: '', legalStatus: '', natureOfBusiness: '',
   registeredAddress: '', homeAddress: '', officePhone: '', ownerNumber: '', email: '', contactPerson: '', contactPersonMobile: '',
-  references: [{ vendorName: '', phoneNumber: '' }],
+  references: [
+    { vendorName: '', phoneNumber: '' },
+    { vendorName: '', phoneNumber: '' }
+  ],
   lastYearTurnover: '', currentYearTurnover: '', bankName: '', accountNumber: '',
   compliance: COMPLIANCE_ITEMS.reduce((acc, item) => ({ ...acc, [item]: false }), {}),
   attachedFiles: [],
@@ -147,12 +150,24 @@ const App: React.FC = () => {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    if (!formData.customerCode.trim()) {
-      setErrorMessage("Please enter Customer Code before submitting.");
-      return;
-    }
     if (!formData.companyName.trim()) {
       setErrorMessage("Please enter Customer Name / Company Name before submitting.");
+      return;
+    }
+    if (!formData.ownerName.trim()) {
+      setErrorMessage("Please enter Owner Name before submitting.");
+      return;
+    }
+    if (!formData.registeredAddress.trim()) {
+      setErrorMessage("Please enter Registered Address before submitting.");
+      return;
+    }
+    if (!formData.officePhone.trim()) {
+      setErrorMessage("Please enter Office Phone number before submitting.");
+      return;
+    }
+    if (!formData.email.trim()) {
+      setErrorMessage("Please enter Email Address before submitting.");
       return;
     }
     if (formData.filledBy === 'Sales Manager' && !formData.salesManagerName.trim()) {
@@ -161,6 +176,13 @@ const App: React.FC = () => {
     }
     if (!formData.fillingAuthorityName.trim()) {
       setErrorMessage("Please enter 'Prepared By Name' under Filling Authority section.");
+      return;
+    }
+
+    // Mandatory check for at least 2 Vendor References
+    const validReferences = formData.references.filter(r => r.vendorName.trim() !== '' && r.phoneNumber.trim() !== '');
+    if (validReferences.length < 2) {
+      setErrorMessage("Section 3 requires at least 2 complete Business Vendor References (Vendor Name & Phone Number).");
       return;
     }
 
@@ -299,9 +321,9 @@ const App: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Section title="Section 1: Business Profile" icon={<Building2 className="w-5 h-5 text-sky-600" />}>
               <div className="space-y-4">
-                <Input label="Customer Code" required value={formData.customerCode} onChange={v => handleChange('customerCode', v)} placeholder="e.g. CUST-8841" />
+                <Input label="Customer Code" value={formData.customerCode} onChange={v => handleChange('customerCode', v)} placeholder="e.g. CUST-8841 (Optional)" />
                 <Input label="Customer Name / Company Name" required value={formData.companyName} onChange={v => handleChange('companyName', v)} placeholder="Full registered company name" />
-                <Input label="Owner Name" value={formData.ownerName} onChange={v => handleChange('ownerName', v)} placeholder="Owner / Director name" />
+                <Input label="Owner Name" required value={formData.ownerName} onChange={v => handleChange('ownerName', v)} placeholder="Owner / Director name" />
                 <div className="grid grid-cols-2 gap-4">
                   <Input label="Year Established" type="number" value={formData.yearEstablished} onChange={v => handleChange('yearEstablished', v)} placeholder="YYYY" />
                   <Input label="Nature of Business" value={formData.natureOfBusiness} onChange={v => handleChange('natureOfBusiness', v)} placeholder="e.g. IT Trading / Services" />
@@ -326,13 +348,13 @@ const App: React.FC = () => {
 
             <Section title="Section 2: Contacts" icon={<Contact className="w-5 h-5 text-sky-600" />}>
               <div className="space-y-4">
-                <Input label="Registered Address" value={formData.registeredAddress} onChange={v => handleChange('registeredAddress', v)} placeholder="Registered office address" />
+                <Input label="Registered Address" required value={formData.registeredAddress} onChange={v => handleChange('registeredAddress', v)} placeholder="Registered office address" />
                 <Input label="Home Address" value={formData.homeAddress} onChange={v => handleChange('homeAddress', v)} placeholder="Owner home address" />
                 <div className="grid grid-cols-2 gap-4">
-                  <Input label="Office Phone" value={formData.officePhone} onChange={v => handleChange('officePhone', v)} placeholder="Office contact number" />
+                  <Input label="Office Phone" required value={formData.officePhone} onChange={v => handleChange('officePhone', v)} placeholder="Office contact number" />
                   <Input label="Owner Mobile" value={formData.ownerNumber} onChange={v => handleChange('ownerNumber', v)} placeholder="Owner direct mobile" />
                 </div>
-                <Input label="Email Address" type="email" value={formData.email} onChange={v => handleChange('email', v)} placeholder="Official email for correspondence" />
+                <Input label="Email Address" type="email" required value={formData.email} onChange={v => handleChange('email', v)} placeholder="Official email for correspondence" />
                 <div className="grid grid-cols-2 gap-4">
                   <Input label="Contact Person" value={formData.contactPerson} onChange={v => handleChange('contactPerson', v)} placeholder="Primary key contact" />
                   <Input label="Mobile Number" value={formData.contactPersonMobile} onChange={v => handleChange('contactPersonMobile', v)} placeholder="Key contact mobile" />
@@ -341,17 +363,17 @@ const App: React.FC = () => {
             </Section>
           </div>
 
-          <Section title="Section 3: Business References" icon={<Briefcase className="w-5 h-5 text-sky-600" />}>
+          <Section title="Section 3: Business References (2 Mandatory)" icon={<Briefcase className="w-5 h-5 text-sky-600" />}>
             <div className="space-y-4">
               {formData.references.map((ref, idx) => (
                 <div key={`ref-${idx}`} className="flex gap-4 items-end bg-slate-50 p-4 rounded-lg border border-slate-200">
                   <div className="flex-1">
-                    <Input label="Vendor Name" value={ref.vendorName} onChange={v => handleReferenceChange(idx, 'vendorName', v)} placeholder="Reference Vendor Company" />
+                    <Input label={`Vendor Name ${idx < 2 ? '*' : ''}`} required={idx < 2} value={ref.vendorName} onChange={v => handleReferenceChange(idx, 'vendorName', v)} placeholder={`Reference Vendor Company ${idx + 1}`} />
                   </div>
                   <div className="flex-1">
-                    <Input label="Phone Number" value={ref.phoneNumber} onChange={v => handleReferenceChange(idx, 'phoneNumber', v)} placeholder="Contact number" />
+                    <Input label={`Phone Number ${idx < 2 ? '*' : ''}`} required={idx < 2} value={ref.phoneNumber} onChange={v => handleReferenceChange(idx, 'phoneNumber', v)} placeholder="Contact number" />
                   </div>
-                  {formData.references.length > 1 && (
+                  {formData.references.length > 2 && (
                     <button type="button" onClick={() => removeReference(idx)} className="mb-1 p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Remove reference">
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -359,7 +381,7 @@ const App: React.FC = () => {
                 </div>
               ))}
               <button type="button" onClick={addReference} className="flex items-center gap-2 text-slate-700 font-semibold hover:text-slate-900 transition-colors text-sm">
-                <Plus className="w-4 h-4" /> Add Vendor Reference
+                <Plus className="w-4 h-4" /> Add Additional Vendor Reference
               </button>
             </div>
           </Section>
