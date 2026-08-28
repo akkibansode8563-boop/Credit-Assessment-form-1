@@ -228,12 +228,12 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pb-20 bg-slate-100">
+    <div id="form-capture-area" className="min-h-screen pb-20 bg-slate-100">
       <Header />
       
       <main className="max-w-6xl mx-auto px-4 pt-36 md:pt-32">
         {errorMessage && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-red-700 shadow-md animate-in fade-in duration-300">
+          <div className="no-pdf mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-red-700 shadow-md animate-in fade-in duration-300">
             <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
             <div className="space-y-1 flex-1">
               <p className="font-bold text-sm">System Validation Alert</p>
@@ -246,7 +246,7 @@ const App: React.FC = () => {
         )}
 
         {successMessage && (
-          <div className="mb-6 p-5 bg-emerald-50 border border-emerald-300 rounded-2xl flex items-start gap-3 text-emerald-900 shadow-lg animate-in fade-in duration-300">
+          <div className="no-pdf mb-6 p-5 bg-emerald-50 border border-emerald-300 rounded-2xl flex items-start gap-3 text-emerald-900 shadow-lg animate-in fade-in duration-300">
             <CheckCircle2 className="w-6 h-6 mt-0.5 text-emerald-600 flex-shrink-0" />
             <div className="space-y-1 flex-1">
               <p className="font-black text-sm uppercase tracking-wide">Real-time Submission & Email Dispatch Complete!</p>
@@ -507,7 +507,7 @@ const App: React.FC = () => {
             </div>
           </Section>
 
-          <div className="sticky bottom-6 z-40 flex justify-center pt-8">
+          <div className="no-pdf sticky bottom-6 z-40 flex justify-center pt-8">
             <div className="bg-slate-900/95 backdrop-blur-xl p-4 rounded-3xl shadow-2xl border border-slate-800 flex flex-col md:flex-row gap-4 w-full max-w-2xl">
               <button 
                 type="button" 
