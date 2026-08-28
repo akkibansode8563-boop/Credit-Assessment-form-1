@@ -19,6 +19,7 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
     });
 
     const primaryColor: [number, number, number] = [15, 23, 42]; 
+    const accentColor: [number, number, number] = [2, 132, 199];
     const lightBg: [number, number, number] = [248, 250, 252];
 
     const addSectionTitle = (text: string, y: number) => {
@@ -38,26 +39,53 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
       return isNaN(finalY) ? currentY + 10 : finalY + 10;
     };
 
-    doc.setFontSize(16);
-    doc.setTextColor(15, 23, 42);
-    doc.setFont('helvetica', 'bold');
-    doc.text(COMPANY_NAME, 15, 20);
-    
-    doc.setDrawColor(15, 23, 42);
-    doc.setLineWidth(0.8);
-    doc.line(15, 22, 15 + (doc.getTextWidth(COMPANY_NAME)), 22);
+    // Header Branding - DCC Infotech
+    doc.setFillColor(15, 23, 42);
+    doc.rect(15, 12, 180, 22, 'F');
 
-    doc.setFontSize(18);
-    doc.setTextColor(15, 23, 42);
+    doc.setFontSize(14);
+    doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
-    doc.text("CREDIT ASSESSMENT REPORT", 195, 20, { align: 'right' });
-    
-    doc.setFontSize(8);
+    doc.text(COMPANY_NAME, 22, 22);
+
+    doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 116, 139);
-    doc.text("INTERNAL EVALUATION SYSTEM", 195, 25, { align: 'right' });
+    doc.setTextColor(56, 189, 248);
+    doc.text("DATA CARE CORPORATION GROUP", 22, 27);
+
+    doc.setFontSize(14);
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.text("CREDIT ASSESSMENT REPORT", 188, 22, { align: 'right' });
     
-    let currentY = 40;
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(148, 163, 184);
+    doc.text("INTERNAL EVALUATION & RISK CONTROL", 188, 27, { align: 'right' });
+    
+    let currentY = 42;
+
+    // Persona / Submission Source Table
+    const filledByText = data.filledBy === 'Sales Manager' 
+      ? `Sales Manager on behalf of Customer (${data.salesManagerName || 'N/A'} - ${data.salesManagerContact || 'N/A'})`
+      : 'Direct Customer';
+
+    currentY = addSectionTitle("Form Filling Persona & Submission Details", currentY);
+    autoTable(doc, {
+      startY: currentY,
+      body: [
+        ['Form Filled By', filledByText, 'Submission Date', String(data.fillingDate || 'N/A')],
+        ['Prepared By Name', String(data.fillingAuthorityName || 'N/A'), 'Customer Code', String(data.customerCode || 'N/A')]
+      ],
+      theme: 'grid',
+      styles: { fontSize: 8, cellPadding: 2.5, font: 'helvetica' },
+      columnStyles: { 
+        0: { fontStyle: 'bold', fillColor: lightBg, cellWidth: 38 }, 
+        2: { fontStyle: 'bold', fillColor: lightBg, cellWidth: 35 } 
+      },
+      margin: { left: 15, right: 15 }
+    });
+    currentY = getNextY(currentY);
 
     currentY = addSectionTitle("Business Profile & Contact Details", currentY);
     autoTable(doc, {
@@ -126,6 +154,24 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
     });
     currentY = getNextY(currentY);
 
+    // Document Uploads Section
+    if (currentY > 220) { doc.addPage(); currentY = 20; }
+    currentY = addSectionTitle("Uploaded Document Attachments", currentY);
+    const attachedRows = (data.attachedFiles && data.attachedFiles.length > 0)
+      ? data.attachedFiles.map(f => [String(f.name), String(f.type || 'File'), `${(f.size / 1024).toFixed(1)} KB`])
+      : [['No separate document files uploaded.', '-', '-']];
+      
+    autoTable(doc, {
+      startY: currentY,
+      head: [['File Name', 'Format / Type', 'Size']],
+      body: attachedRows,
+      theme: 'striped',
+      styles: { fontSize: 7.5, font: 'helvetica' },
+      headStyles: { fillColor: accentColor, textColor: [255, 255, 255] as [number, number, number] },
+      margin: { left: 15, right: 15 }
+    });
+    currentY = getNextY(currentY);
+
     if (currentY > 220) { doc.addPage(); currentY = 20; }
     currentY = addSectionTitle("Field Visit Details", currentY);
     autoTable(doc, {
@@ -160,59 +206,40 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
     });
     currentY = getNextY(currentY);
 
-    if (currentY > 240) { doc.addPage(); currentY = 20; }
-    currentY = addSectionTitle("Submission Authority", currentY);
+    if (currentY > 210) { doc.addPage(); currentY = 20; }
+    currentY = addSectionTitle("Authorization & Sanction Authorities", currentY);
+    
+    const sanctionsData = Object.values(data.sanctions).map(s => [
+      String(s.designation || 'Authority'),
+      String(s.name || 'Pending Review'),
+      String(s.date || '-')
+    ]);
+
     autoTable(doc, {
       startY: currentY,
-      body: [
-        ['Prepared By', String(data.fillingAuthorityName || 'N/A'), 'Submission Date', String(data.fillingDate || 'N/A')]
-      ],
+      head: [['Role / Authority Designation', 'Authority Name', 'Sanction Date']],
+      body: sanctionsData,
       theme: 'grid',
-      styles: { fontSize: 8, font: 'helvetica' },
-      columnStyles: { 
-        0: { fontStyle: 'bold', fillColor: lightBg, cellWidth: 35 }, 
-        2: { fontStyle: 'bold', fillColor: lightBg, cellWidth: 35 } 
+      styles: { fontSize: 8, cellPadding: 3, font: 'helvetica' },
+      headStyles: { fillColor: primaryColor, textColor: [255, 255, 255] as [number, number, number] },
+      columnStyles: {
+        0: { fontStyle: 'bold', fillColor: lightBg }
       },
       margin: { left: 15, right: 15 }
     });
     currentY = getNextY(currentY);
 
-    if (currentY > 210) { doc.addPage(); currentY = 20; }
-    currentY = addSectionTitle("Authorization & Sanctions", currentY);
-    
-    const sanctions = data.sanctions;
-    const sigWidth = 40;
-    const sigLineOffset = 15;
-    const marginX = 15;
-    const spacingX = 45;
-
-    Object.entries(sanctions).forEach(([key, sig], index) => {
-      const x = marginX + (index % 4) * spacingX;
-      const yBase = currentY + 5;
-      
-      doc.setDrawColor(148, 163, 184); 
-      doc.setLineWidth(0.3);
-      doc.line(x, yBase + sigLineOffset, x + sigWidth, yBase + sigLineOffset);
-
-      doc.setFontSize(7);
-      doc.setTextColor(100, 116, 139); 
-      doc.setFont('helvetica', 'normal');
-      doc.text(String(sig.designation || "Role"), x, yBase + sigLineOffset + 5);
-      
-      // Name rendering removed to support anonymous process
-      
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(6);
-      doc.text(`Date: ${String(sig.date || "-")}`, x, yBase + sigLineOffset + 9);
-    });
-
+    const pageCount = (doc as any).internal.getNumberOfPages();
     const pageHeight = doc.internal.pageSize.getHeight();
-    doc.setFontSize(7);
-    doc.setTextColor(148, 163, 184);
-    doc.setFont('helvetica', 'italic');
-    doc.text(`System Reference: CARES-${Date.now().toString().slice(-6)}`, 15, pageHeight - 10);
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, 105, pageHeight - 10, { align: 'center' });
-    doc.text(`Page 1 of 1`, 195, pageHeight - 10, { align: 'right' });
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(7);
+      doc.setTextColor(148, 163, 184);
+      doc.setFont('helvetica', 'italic');
+      doc.text(`System Reference: CARES-${Date.now().toString().slice(-6)}`, 15, pageHeight - 10);
+      doc.text(`DCC INFOTECH INTERNAL CONFIDENTIAL`, 105, pageHeight - 10, { align: 'center' });
+      doc.text(`Page ${i} of ${pageCount}`, 195, pageHeight - 10, { align: 'right' });
+    }
 
     const fileName = `CARES_${data.customerCode || 'Report'}_${Date.now().toString().slice(-4)}.pdf`;
     

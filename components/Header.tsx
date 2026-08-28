@@ -4,17 +4,29 @@ import { COMPANY_NAME } from '../constants';
 
 const Header: React.FC = () => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col items-center gap-2">
-        <div className="flex items-center justify-center py-2">
-          <span className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter uppercase border-b-4 border-slate-900 pb-1">
-            {COMPANY_NAME}
+    <header className="fixed top-0 left-0 right-0 z-50 bg-slate-900 border-b border-slate-800 shadow-md">
+      <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="bg-sky-500/10 border border-sky-400/30 p-2 rounded-xl text-sky-400 font-black text-2xl tracking-tighter flex items-center justify-center w-12 h-12 shadow-inner">
+            DCC
+          </div>
+          <div>
+            <span className="text-xl md:text-2xl font-black text-white tracking-tight uppercase block leading-none">
+              {COMPANY_NAME}
+            </span>
+            <span className="text-[10px] font-bold text-sky-400 tracking-widest uppercase block mt-1">
+              Data Care Corporation Group
+            </span>
+          </div>
+        </div>
+        <div className="text-center md:text-right">
+          <h1 className="text-xs md:text-sm font-bold text-slate-300 tracking-widest uppercase">
+            Credit Assessment & Risk Evaluation System
+          </h1>
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5">
+            Internal Evaluation & Credit Control Portal
           </span>
         </div>
-        <div className="h-px w-32 bg-slate-200 mt-2" />
-        <h1 className="text-lg md:text-xl font-bold text-slate-600 tracking-widest text-center uppercase mt-1">
-          Credit Assessment & Risk Evaluation System
-        </h1>
       </div>
     </header>
   );

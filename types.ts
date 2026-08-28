@@ -10,7 +10,19 @@ export interface SignatureData {
   date: string;
 }
 
+export interface AttachedFile {
+  name: string;
+  type: string;
+  size: number;
+  dataUrl: string;
+}
+
 export interface FormData {
+  // Persona
+  filledBy: 'Customer' | 'Sales Manager';
+  salesManagerName: string;
+  salesManagerContact: string;
+
   // Section 1: Business Profile
   customerCode: string;
   companyName: string;
@@ -59,6 +71,9 @@ export interface FormData {
 
   // Section 5: Compliance
   compliance: { [key: string]: boolean };
+
+  // Document Uploads
+  attachedFiles: AttachedFile[];
 
   // Helper for submission
   pdfData?: string;
