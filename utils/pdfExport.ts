@@ -57,7 +57,7 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
 
     // Persona / Submission Source Table
     const filledByText = data.filledBy === 'Sales Manager' 
-      ? `Sales Manager on behalf of Customer (${data.salesManagerName || 'N/A'} - ${data.salesManagerContact || 'N/A'})`
+      ? `Sales Manager on behalf of Customer (${data.salesManagerName || 'N/A'})`
       : 'Direct Customer';
 
     currentY = addSectionTitle("Form Filling Persona & Submission Details", currentY);

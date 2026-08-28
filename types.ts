@@ -22,7 +22,7 @@ export interface FormData {
   // Persona
   filledBy: 'Customer' | 'Sales Manager';
   salesManagerName: string;
-  salesManagerContact: string;
+  salesManagerContact?: string;
 
   // Section 1: Business Profile
   customerCode: string;

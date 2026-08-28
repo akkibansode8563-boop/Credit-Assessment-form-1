@@ -110,7 +110,7 @@ function sendEmailNotification(formData) {
   const subject = "CARES Credit Assessment: " + (formData.companyName || "New Evaluation") + " (" + (formData.customerCode || "N/A") + ")";
   
   const filledByDetails = formData.filledBy === "Sales Manager" 
-    ? `<b>Sales Manager (On behalf of Customer)</b><br/>Manager Name: ${formData.salesManagerName || 'N/A'} (Contact: ${formData.salesManagerContact || 'N/A'})`
+    ? `<b>Sales Manager (On behalf of Customer)</b><br/>Manager Name: ${formData.salesManagerName || 'N/A'}`
     : `<b>Direct Customer</b>`;
 
   const attachedFilesCount = formData.attachedFiles ? formData.attachedFiles.length : 0;

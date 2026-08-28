@@ -283,19 +283,13 @@ const App: React.FC = () => {
               </div>
 
               {formData.filledBy === 'Sales Manager' && (
-                <div className="mt-4 p-4 bg-sky-50 border border-sky-200 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in duration-200">
+                <div className="mt-4 p-4 bg-sky-50 border border-sky-200 rounded-xl animate-in fade-in duration-200">
                   <Input 
                     label="Sales Manager Name" 
                     required 
                     value={formData.salesManagerName} 
                     onChange={v => handleChange('salesManagerName', v)}
                     placeholder="Enter Sales Manager full name..." 
-                  />
-                  <Input 
-                    label="Sales Manager Contact / Employee ID" 
-                    value={formData.salesManagerContact} 
-                    onChange={v => handleChange('salesManagerContact', v)}
-                    placeholder="Phone number or Employee ID..." 
                   />
                 </div>
               )}
