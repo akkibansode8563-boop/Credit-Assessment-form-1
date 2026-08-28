@@ -95,38 +95,42 @@ const App: React.FC = () => {
     }));
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+  const handleItemFileUpload = (item: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    Array.from(files).forEach(file => {
-      if (file.size > 10 * 1024 * 1024) {
-        setErrorMessage(`File "${file.name}" exceeds 10MB limit.`);
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string;
-        const newAttachment: AttachedFile = {
-          name: file.name,
-          type: file.type || 'application/octet-stream',
-          size: file.size,
-          dataUrl: dataUrl
-        };
-        setFormData(prev => ({
-          ...prev,
-          attachedFiles: [...prev.attachedFiles, newAttachment]
-        }));
+    if (file.size > 10 * 1024 * 1024) {
+      setErrorMessage(`File "${file.name}" exceeds 10MB limit.`);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      const newAttachment: AttachedFile = {
+        name: file.name,
+        type: file.type || 'application/octet-stream',
+        size: file.size,
+        dataUrl: dataUrl,
+        complianceItem: item
       };
-      reader.readAsDataURL(file);
-    });
+      setFormData(prev => ({
+        ...prev,
+        compliance: { ...prev.compliance, [item]: true },
+        attachedFiles: [
+          ...prev.attachedFiles.filter(f => f.complianceItem !== item),
+          newAttachment
+        ]
+      }));
+    };
+    reader.readAsDataURL(file);
     e.target.value = '';
   };
 
-  const removeAttachment = (index: number) => {
+  const removeItemAttachment = (item: string) => {
     setFormData(prev => ({
       ...prev,
-      attachedFiles: prev.attachedFiles.filter((_, i) => i !== index)
+      attachedFiles: prev.attachedFiles.filter(f => f.complianceItem !== item)
     }));
   };
 
@@ -375,68 +379,56 @@ const App: React.FC = () => {
             </div>
           </Section>
 
-          <Section title="Section 5: Compliance Checklist" icon={<CheckCircle2 className="w-5 h-5 text-sky-600" />}>
+          <Section title="Section 5: Compliance Checklist & Document Attachments" icon={<CheckCircle2 className="w-5 h-5 text-sky-600" />}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {COMPLIANCE_ITEMS.map((item) => (
-                <label key={`comp-${item}`} className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-all ${
-                  formData.compliance[item] ? 'bg-emerald-50/60 border-emerald-300' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
-                }`}>
-                  <input 
-                    type="checkbox" 
-                    checked={!!formData.compliance[item]} 
-                    onChange={() => toggleCompliance(item)}
-                    className="w-5 h-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
-                  />
-                  <span className="text-xs text-slate-700 font-bold">{String(item)}</span>
-                </label>
-              ))}
-            </div>
-          </Section>
+              {COMPLIANCE_ITEMS.map((item) => {
+                const itemAttachment = formData.attachedFiles.find(f => f.complianceItem === item);
+                const isChecked = !!formData.compliance[item];
+                return (
+                  <div key={`comp-${item}`} className={`flex flex-col justify-between p-3.5 border rounded-xl transition-all ${
+                    isChecked || itemAttachment ? 'bg-emerald-50/60 border-emerald-300 shadow-sm' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
+                  }`}>
+                    <div className="flex items-center justify-between gap-2">
+                      <label className="flex items-center gap-2.5 cursor-pointer flex-1 select-none">
+                        <input 
+                          type="checkbox" 
+                          checked={isChecked} 
+                          onChange={() => toggleCompliance(item)}
+                          className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                        />
+                        <span className="text-xs text-slate-800 font-bold leading-tight">{String(item)}</span>
+                      </label>
 
-          <Section title="Document Uploads & Attachments" icon={<Paperclip className="w-5 h-5 text-sky-600" />}>
-            <div className="space-y-4">
-              <div className="p-6 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50/50 hover:bg-slate-50 transition-colors text-center">
-                <Paperclip className="w-8 h-8 mx-auto text-slate-400 mb-2" />
-                <p className="text-sm font-bold text-slate-700">Upload Compliance Documents & Certificates</p>
-                <p className="text-xs text-slate-500 mt-1 mb-4">Attach GST Certificate, PAN Card, Aadhaar, Bank Statements, Light Bills, Security Cheques (Max 10MB per file)</p>
-                <label className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase cursor-pointer hover:bg-slate-800 shadow-md transition-all">
-                  <Plus className="w-4 h-4" /> Select Documents
-                  <input 
-                    type="file" 
-                    multiple 
-                    onChange={handleFileUpload} 
-                    className="hidden"
-                    accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
-                  />
-                </label>
-              </div>
+                      <label className="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-sky-100 rounded-lg cursor-pointer transition-colors flex-shrink-0" title={`Attach file for ${item}`}>
+                        <Paperclip className={`w-4 h-4 ${itemAttachment ? 'text-emerald-600 font-bold' : ''}`} />
+                        <input 
+                          type="file" 
+                          className="hidden" 
+                          onChange={(e) => handleItemFileUpload(item, e)}
+                          accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
+                        />
+                      </label>
+                    </div>
 
-              {formData.attachedFiles.length > 0 && (
-                <div className="space-y-2">
-                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wider block">Uploaded Attachments ({formData.attachedFiles.length}):</span>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {formData.attachedFiles.map((file, idx) => (
-                      <div key={`file-${idx}`} className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl shadow-sm">
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          <FileCheck className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                          <div className="truncate">
-                            <span className="text-xs font-bold text-slate-800 block truncate">{file.name}</span>
-                            <span className="text-[10px] text-slate-400 block uppercase">{(file.size / 1024).toFixed(1)} KB • {file.type.split('/')[1] || 'Doc'}</span>
-                          </div>
+                    {itemAttachment && (
+                      <div className="mt-2.5 pt-2 border-t border-emerald-200/60 flex items-center justify-between gap-2 text-[10px] text-emerald-800 bg-white/80 px-2 py-1 rounded-md">
+                        <div className="flex items-center gap-1.5 truncate">
+                          <FileCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                          <span className="truncate font-semibold">{itemAttachment.name}</span>
                         </div>
                         <button 
                           type="button" 
-                          onClick={() => removeAttachment(idx)}
-                          className="p-1 text-slate-400 hover:text-red-600 transition-colors"
+                          onClick={() => removeItemAttachment(item)}
+                          className="text-slate-400 hover:text-red-600 transition-colors flex-shrink-0"
                           title="Remove attachment"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
-                    ))}
+                    )}
                   </div>
-                </div>
-              )}
+                );
+              })}
             </div>
           </Section>
 

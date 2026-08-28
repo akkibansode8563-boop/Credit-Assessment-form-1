@@ -159,7 +159,7 @@ function sendEmailNotification(formData) {
     options.attachments.push(pdfBlob);
   }
 
-  // 2. Attach uploaded compliance documents
+  // 2. Attach uploaded compliance documents individually renamed per section item
   if (formData.attachedFiles && Array.isArray(formData.attachedFiles)) {
     formData.attachedFiles.forEach(function(file, idx) {
       try {
@@ -168,7 +168,29 @@ function sendEmailNotification(formData) {
           const base64Data = parts.length > 1 ? parts[1] : parts[0];
           const decodedDoc = Utilities.base64Decode(base64Data);
           const mimeType = file.type || "application/octet-stream";
-          const docBlob = Utilities.newBlob(decodedDoc, mimeType, file.name || ("Attachment_" + (idx + 1)));
+
+          // Extract original extension
+          let fileExt = "";
+          if (file.name && file.name.indexOf(".") !== -1) {
+            fileExt = file.name.substring(file.name.lastIndexOf("."));
+          } else {
+            if (mimeType.indexOf("pdf") !== -1) fileExt = ".pdf";
+            else if (mimeType.indexOf("png") !== -1) fileExt = ".png";
+            else if (mimeType.indexOf("jpeg") !== -1 || mimeType.indexOf("jpg") !== -1) fileExt = ".jpg";
+            else fileExt = ".dat";
+          }
+
+          // Format filename based on compliance section item name
+          let fileName;
+          if (file.complianceItem) {
+            const cleanItemName = file.complianceItem.replace(/[^a-zA-Z0-9]/g, "_");
+            const customerCodeTag = formData.customerCode ? ("_" + formData.customerCode.replace(/[^a-zA-Z0-9]/g, "")) : "";
+            fileName = cleanItemName + customerCodeTag + fileExt;
+          } else {
+            fileName = file.name || ("Attachment_" + (idx + 1) + fileExt);
+          }
+
+          const docBlob = Utilities.newBlob(decodedDoc, mimeType, fileName);
           options.attachments.push(docBlob);
         }
       } catch (attachErr) {

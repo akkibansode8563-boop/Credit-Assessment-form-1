@@ -39,31 +39,21 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
       return isNaN(finalY) ? currentY + 10 : finalY + 10;
     };
 
-    // Header Branding - DCC Infotech
+    // Header Branding - Centered DCC Infotech
     doc.setFillColor(15, 23, 42);
-    doc.rect(15, 12, 180, 22, 'F');
+    doc.rect(15, 12, 180, 24, 'F');
 
     doc.setFontSize(14);
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
-    doc.text(COMPANY_NAME, 22, 22);
+    doc.text(COMPANY_NAME, 105, 21, { align: 'center' });
 
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
     doc.setTextColor(56, 189, 248);
-    doc.text("DATA CARE CORPORATION GROUP", 22, 27);
-
-    doc.setFontSize(14);
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.text("CREDIT ASSESSMENT REPORT", 188, 22, { align: 'right' });
+    doc.text("CREDIT ASSESSMENT & RISK EVALUATION REPORT", 105, 28, { align: 'center' });
     
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(148, 163, 184);
-    doc.text("INTERNAL EVALUATION & RISK CONTROL", 188, 27, { align: 'right' });
-    
-    let currentY = 42;
+    let currentY = 44;
 
     // Persona / Submission Source Table
     const filledByText = data.filledBy === 'Sales Manager' 
@@ -139,38 +129,31 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
     currentY = getNextY(currentY);
 
     if (currentY > 210) { doc.addPage(); currentY = 20; }
-    currentY = addSectionTitle("Compliance Checklist", currentY);
-    const complianceData = COMPLIANCE_ITEMS.map(item => [String(item), data.compliance && data.compliance[item] ? 'YES' : 'NO']);
+    currentY = addSectionTitle("Compliance Checklist & Attached Documents", currentY);
+    const complianceData = COMPLIANCE_ITEMS.map(item => {
+      const isChecked = data.compliance && data.compliance[item];
+      const attached = data.attachedFiles ? data.attachedFiles.find(f => f.complianceItem === item) : undefined;
+      const statusText = isChecked ? 'YES' : 'NO';
+      const fileText = attached ? `${attached.name} (${(attached.size / 1024).toFixed(1)} KB)` : 'No attachment';
+      return [String(item), statusText, fileText];
+    });
+
     autoTable(doc, {
       startY: currentY,
+      head: [['Compliance Item', 'Verified', 'Attached File']],
       body: complianceData,
       theme: 'grid',
-      styles: { fontSize: 7, cellPadding: 1.5, font: 'helvetica' },
+      styles: { fontSize: 7.5, cellPadding: 2, font: 'helvetica' },
+      headStyles: { fillColor: primaryColor, textColor: [255, 255, 255] as [number, number, number] },
       columnStyles: { 
-        1: { fontStyle: 'bold', halign: 'center', cellWidth: 25, textColor: [51, 65, 85] as [number, number, number] } 
+        0: { fontStyle: 'bold' },
+        1: { fontStyle: 'bold', halign: 'center', cellWidth: 20 },
+        2: { fontStyle: 'italic', textColor: [51, 65, 85] as [number, number, number] }
       },
-      margin: { left: 15, right: 15 },
-      tableWidth: 120
-    });
-    currentY = getNextY(currentY);
-
-    // Document Uploads Section
-    if (currentY > 220) { doc.addPage(); currentY = 20; }
-    currentY = addSectionTitle("Uploaded Document Attachments", currentY);
-    const attachedRows = (data.attachedFiles && data.attachedFiles.length > 0)
-      ? data.attachedFiles.map(f => [String(f.name), String(f.type || 'File'), `${(f.size / 1024).toFixed(1)} KB`])
-      : [['No separate document files uploaded.', '-', '-']];
-      
-    autoTable(doc, {
-      startY: currentY,
-      head: [['File Name', 'Format / Type', 'Size']],
-      body: attachedRows,
-      theme: 'striped',
-      styles: { fontSize: 7.5, font: 'helvetica' },
-      headStyles: { fillColor: accentColor, textColor: [255, 255, 255] as [number, number, number] },
       margin: { left: 15, right: 15 }
     });
     currentY = getNextY(currentY);
+
 
     if (currentY > 220) { doc.addPage(); currentY = 20; }
     currentY = addSectionTitle("Field Visit Details", currentY);

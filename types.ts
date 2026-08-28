@@ -15,6 +15,7 @@ export interface AttachedFile {
   type: string;
   size: number;
   dataUrl: string;
+  complianceItem?: string;
 }
 
 export interface FormData {
