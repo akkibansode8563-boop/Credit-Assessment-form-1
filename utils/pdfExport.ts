@@ -84,10 +84,12 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
         ['Form Filled By', filledByText, 'Submission Date', String(data.fillingDate || 'N/A')]
       ],
       theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 2.5, font: 'helvetica' },
+      styles: { fontSize: 8, cellPadding: 3, font: 'helvetica', overflow: 'linebreak' },
       columnStyles: { 
-        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 38 }, 
-        2: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 35 } 
+        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 }, 
+        1: { cellWidth: 42 },
+        2: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 },
+        3: { cellWidth: 42 }
       },
       margin: { left: 15, right: 15 }
     });
@@ -103,10 +105,12 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
         ['Firm Type / Legal Status', String(data.legalStatus || 'N/A'), 'Nature of Business', String(data.natureOfBusiness || 'N/A')]
       ],
       theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 2.5, font: 'helvetica' },
+      styles: { fontSize: 8, cellPadding: 3, font: 'helvetica', overflow: 'linebreak' },
       columnStyles: { 
-        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 42 }, 
-        2: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 42 } 
+        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 }, 
+        1: { cellWidth: 42 },
+        2: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 },
+        3: { cellWidth: 42 }
       },
       margin: { left: 15, right: 15 }
     });
@@ -123,10 +127,12 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
         ['Key Contact Mobile', String(data.contactPersonMobile || 'N/A'), '', '']
       ],
       theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 2.5, font: 'helvetica' },
+      styles: { fontSize: 8, cellPadding: 3, font: 'helvetica', overflow: 'linebreak' },
       columnStyles: { 
-        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 38 }, 
-        2: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 38 } 
+        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 }, 
+        1: { cellWidth: 42 },
+        2: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 },
+        3: { cellWidth: 42 }
       },
       margin: { left: 15, right: 15 }
     });
@@ -142,8 +148,12 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
         String(r.phoneNumber || '-')
       ]),
       theme: 'grid',
-      styles: { fontSize: 8, font: 'helvetica', cellPadding: 2.5 },
+      styles: { fontSize: 8, font: 'helvetica', cellPadding: 3, overflow: 'linebreak' },
       headStyles: { fillColor: skyAccent, textColor: [255, 255, 255], fontStyle: 'bold' },
+      columnStyles: {
+        0: { cellWidth: 90, fontStyle: 'bold' },
+        1: { cellWidth: 90 }
+      },
       margin: { left: 15, right: 15 }
     });
     currentY = getNextY(currentY);
@@ -160,10 +170,12 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
         ['Primary Bank Name', String(data.bankName || 'N/A'), 'Account Number', String(data.accountNumber || 'N/A')]
       ],
       theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 2.5, font: 'helvetica' },
+      styles: { fontSize: 8, cellPadding: 3, font: 'helvetica', overflow: 'linebreak' },
       columnStyles: { 
-        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 42 }, 
-        2: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 42 } 
+        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 }, 
+        1: { cellWidth: 42 },
+        2: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 },
+        3: { cellWidth: 42 }
       },
       margin: { left: 15, right: 15 }
     });
@@ -185,12 +197,12 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
       head: [['Compliance Item', 'Verified', 'Attached Document']],
       body: complianceData,
       theme: 'grid',
-      styles: { fontSize: 7.5, cellPadding: 2.2, font: 'helvetica' },
+      styles: { fontSize: 7.5, cellPadding: 2.5, font: 'helvetica', overflow: 'linebreak' },
       headStyles: { fillColor: skyAccent, textColor: [255, 255, 255], fontStyle: 'bold' },
       columnStyles: { 
-        0: { fontStyle: 'bold', cellWidth: 55 },
-        1: { fontStyle: 'bold', halign: 'center', cellWidth: 22 },
-        2: { fontStyle: 'italic', textColor: [51, 65, 85] }
+        0: { fontStyle: 'bold', cellWidth: 60 },
+        1: { fontStyle: 'bold', halign: 'center', cellWidth: 25 },
+        2: { fontStyle: 'italic', textColor: [51, 65, 85], cellWidth: 95 }
       },
       margin: { left: 15, right: 15 }
     });
@@ -205,9 +217,10 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
         ['Site Visit Summary', String(data.fieldVisitSummary || 'No summary provided.')]
       ],
       theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 3.5, font: 'helvetica' },
+      styles: { fontSize: 8, cellPadding: 3.5, font: 'helvetica', overflow: 'linebreak' },
       columnStyles: { 
-        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 38 } 
+        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 },
+        1: { cellWidth: 132 }
       },
       margin: { left: 15, right: 15 }
     });
@@ -223,10 +236,12 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
         ['Proposed Payment Terms', String(data.proposedPaymentTerms || 'N/A'), '', '']
       ],
       theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 2.5, font: 'helvetica' },
+      styles: { fontSize: 8, cellPadding: 3, font: 'helvetica', overflow: 'linebreak' },
       columnStyles: { 
-        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 45 }, 
-        2: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 45 } 
+        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 }, 
+        1: { cellWidth: 42 },
+        2: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 },
+        3: { cellWidth: 42 }
       },
       margin: { left: 15, right: 15 }
     });
@@ -247,10 +262,12 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
       head: [['Role / Authority Designation', 'Authority Name', 'Sanction Date']],
       body: sanctionsData,
       theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 3, font: 'helvetica' },
+      styles: { fontSize: 8, cellPadding: 3, font: 'helvetica', overflow: 'linebreak' },
       headStyles: { fillColor: skyAccent, textColor: [255, 255, 255], fontStyle: 'bold' },
       columnStyles: {
-        0: { fontStyle: 'bold', fillColor: lightHeaderBg }
+        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 70 },
+        1: { cellWidth: 65 },
+        2: { cellWidth: 45 }
       },
       margin: { left: 15, right: 15 }
     });
@@ -265,10 +282,12 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
         ['Prepared By Name', String(data.fillingAuthorityName || 'N/A'), 'Filing Date', String(data.fillingDate || 'N/A')]
       ],
       theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 3, font: 'helvetica' },
+      styles: { fontSize: 8, cellPadding: 3, font: 'helvetica', overflow: 'linebreak' },
       columnStyles: { 
-        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 38 },
-        2: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 35 }
+        0: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 },
+        1: { cellWidth: 42 },
+        2: { fontStyle: 'bold', fillColor: lightHeaderBg, cellWidth: 48 },
+        3: { cellWidth: 42 }
       },
       margin: { left: 15, right: 15 }
     });
