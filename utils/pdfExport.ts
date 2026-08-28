@@ -2,7 +2,7 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { FormData, COMPLIANCE_ITEMS } from '../types';
-import { COMPANY_NAME } from '../constants';
+import { COMPANY_NAME, DCC_LOGO_BASE64 } from '../constants';
 
 /**
  * Safely generates a PDF report.
@@ -39,19 +39,27 @@ export const exportToPDF = async (data: FormData, download: boolean = true): Pro
       return isNaN(finalY) ? currentY + 10 : finalY + 10;
     };
 
-    // Header Branding - Centered DCC Infotech
+    // Header Branding - Centered DCC Infotech with Logo Image
     doc.setFillColor(15, 23, 42);
     doc.rect(15, 12, 180, 24, 'F');
+
+    try {
+      if (DCC_LOGO_BASE64) {
+        doc.addImage(DCC_LOGO_BASE64, 'PNG', 18, 14, 20, 20);
+      }
+    } catch (imgErr) {
+      console.warn("PDF Logo addImage error:", imgErr);
+    }
 
     doc.setFontSize(14);
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
-    doc.text(COMPANY_NAME, 105, 21, { align: 'center' });
+    doc.text(COMPANY_NAME, 108, 21, { align: 'center' });
 
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(56, 189, 248);
-    doc.text("CREDIT ASSESSMENT & RISK EVALUATION REPORT", 105, 28, { align: 'center' });
+    doc.text("CREDIT ASSESSMENT & RISK EVALUATION REPORT", 108, 28, { align: 'center' });
     
     let currentY = 44;
 
